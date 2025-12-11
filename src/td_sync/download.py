@@ -34,6 +34,6 @@ def download_table(
         destination_file=filepath,
     )
 
-    tableframe = pl.read_parquet(filepath).select("timestamp")
+    tableframe = pl.read_parquet(filepath).select(table_columns)
     # tableframe = td.TableFrame.from_polars(tableframe)
     return tableframe

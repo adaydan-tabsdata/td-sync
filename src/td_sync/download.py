@@ -36,7 +36,3 @@ def download_table(
 
     tableframe = pl.read_parquet(filepath).select(table_columns)
     return tableframe
-
-
-x = download_table("root", "sessionized_logs")
-print(x)

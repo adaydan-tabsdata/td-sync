@@ -25,11 +25,18 @@ def download_table(
         filepath.unlink()
 
     server = TabsdataServer(socket, username, password, role)
+    table_columns = server.sample_table(
+        collection_name=collection_name, table_name=table_name
+    ).columns
     table = server.download_table(
         collection_name=collection_name,
         table_name=table_name,
         destination_file=filepath,
     )
 
-    tableframe = pl.read_parquet(filepath)
+    tableframe = pl.read_parquet(filepath).select(table_columns)
     return tableframe
+
+
+x = download_table("root", "sessionized_logs")
+print(x)

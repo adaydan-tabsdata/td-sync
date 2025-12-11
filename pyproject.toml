@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "td-sync"
-version = "0.2.0.8"                # bump
+version = "0.2.0.9"                # bump
 description = "Register/update Tabsdata functions from any file"
 readme = "README.md"
 requires-python = ">=3.9"

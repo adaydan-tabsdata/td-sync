@@ -1,12 +1,8 @@
-import tabsdata as td
 import os
-from tabsdata import api
-from tabsdata.api.tabsdata_server import TabsdataServer, APIServer
-import inspect
-import sys
-import re
 from pathlib import Path
+
 import polars as pl
+from tabsdata.api.tabsdata_server import TabsdataServer
 
 
 def download_table(

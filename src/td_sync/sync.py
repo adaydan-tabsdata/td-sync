@@ -1,17 +1,32 @@
 import inspect
+import json
 import os
 import re
+from urllib.parse import urlparse, urlsplit
 
 from tabsdata.api.tabsdata_server import TabsdataServer
 
 from td_sync.trigger import main as trigger_function
 
 
+def resolve_login_credentials():
+    try:
+        json_path = os.path.expanduser("~/.tabsdata/connection.json")
+        url = json.load(open(json_path))["url"] if os.path.exists(json_path) else None
+        port = urlparse(url).port
+        base = urlsplit(url)
+        host = f"{base.scheme}://{base.netloc}"
+        return {"url": host, "port": port}
+    except:
+        return {"url": "127.0.0.1:2457", "port": "2457"}
+
+
 def main(collection_name: str = None, trigger_function_flag: bool = False):
     call_stack = inspect.stack()
     if "tabsdata/api/tabsdata_server.py" not in str(call_stack):
         # Establish Connection to Server
-        server = TabsdataServer("127.0.0.1:2457", "admin", "tabsdata", "sys_admin")
+        url = resolve_login_credentials()["url"]
+        server = TabsdataServer(url, "admin", "tabsdata", "sys_admin")
         fr = call_stack[1]
         caller_mod = inspect.getmodule(fr.frame)
 
@@ -117,3 +132,6 @@ def main(collection_name: str = None, trigger_function_flag: bool = False):
                 collection_name=collection_name, function_name=function_name
             )
         print()
+
+
+print(resolve_login_credentials())

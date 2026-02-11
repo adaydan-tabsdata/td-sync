@@ -129,7 +129,9 @@ def main(collection_name: str = None, trigger_function_flag: bool = False):
 
         if trigger_function_flag == True:
             trigger_function(
-                collection_name=collection_name, function_name=function_name
+                collection_name=collection_name,
+                function_name=function_name,
+                server=server,
             )
         print()
 

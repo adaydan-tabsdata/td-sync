@@ -16,8 +16,9 @@ def beautify_time(time: str) -> str:
     return time
 
 
-def monitor_execution_or_transaction(transaction):
-    server = TabsdataServer("127.0.0.1:2457", "admin", "tabsdata", "sys_admin")
+def monitor_execution_or_transaction(transaction, server=None):
+    if server is None:
+        server = TabsdataServer("127.0.0.1:2457", "admin", "tabsdata", "sys_admin")
     transaction = transaction
     EXECUTION_FAILED_FINAL_STATUSES = ["Stalled", "Unexpected"]
     EXECUTION_SUCCESSFUL_FINAL_STATUSES = ["Finished", "Committed"]
@@ -219,4 +220,4 @@ def main(collection_name: str = None, function_name: str = None, server=None):
         for i in execution_list
         if i.status not in ["Committed", "Failed", "Canceled", "Stalled"]
     ][-1]
-    monitor_execution_or_transaction(execution)
+    monitor_execution_or_transaction(execution, server=server)

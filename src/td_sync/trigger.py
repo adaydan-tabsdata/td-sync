@@ -1,13 +1,29 @@
+import json
 import re
+from pathlib import Path
 from time import sleep
+from urllib.parse import urlparse
 
 import rich_click as click
 from rich.console import Console
 from rich.live import Live
 from rich.table import Table
-from tabsdata.api.tabsdata_server import TabsdataServer
 
 from td_sync.cancel_flows import main as cancel_trx
+from td_sync.sync_v2 import load_server
+
+_CONNECTION_JSON = Path.home() / ".tabsdata" / "connection.json"
+
+
+def _ui_url(execution_id: str) -> str:
+    try:
+        with open(_CONNECTION_JSON) as f:
+            creds = json.load(f)
+        parsed = urlparse(creds["url"])
+        base = f"{parsed.scheme}://{parsed.hostname}:2460"
+    except Exception:
+        base = "http://localhost:2460"
+    return f"{base}/execution-plans/{execution_id}"
 
 
 def beautify_time(time: str) -> str:
@@ -18,7 +34,7 @@ def beautify_time(time: str) -> str:
 
 def monitor_execution_or_transaction(transaction, server=None):
     if server is None:
-        server = TabsdataServer("127.0.0.1:2457", "admin", "tabsdata", "sys_admin")
+        server = load_server()
     transaction = transaction
     EXECUTION_FAILED_FINAL_STATUSES = ["Stalled", "Unexpected"]
     EXECUTION_SUCCESSFUL_FINAL_STATUSES = ["Finished", "Committed"]
@@ -113,7 +129,7 @@ def monitor_execution_or_transaction(transaction, server=None):
 
 def main(collection_name: str = None, function_name: str = None, server=None):
     if server is None:
-        server = TabsdataServer("127.0.0.1:2457", "admin", "tabsdata", "sys_admin")
+        server = load_server()
     collections_list = server.list_collections()
     collection_list_names = [i.name for i in collections_list]
     options_dict = {i + 1: name for i, name in enumerate(collection_list_names)}
@@ -220,4 +236,5 @@ def main(collection_name: str = None, function_name: str = None, server=None):
         for i in execution_list
         if i.status not in ["Committed", "Failed", "Canceled", "Stalled"]
     ][-1]
+    click.echo(f"\nExecution: {_ui_url(execution.id)}\n")
     monitor_execution_or_transaction(execution, server=server)

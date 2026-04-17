@@ -1,8 +1,8 @@
-from tabsdata.api.tabsdata_server import TabsdataServer
+from td_sync.sync_v2 import load_server
 
 
 def main():
-    server = TabsdataServer("127.0.0.1:2457", "admin", "tabsdata", "sys_admin")
+    server = load_server()
     transactions = server.list_transactions()
     stalled_transactions = [
         i for i in transactions if i.status in ["Stalled", "Running"]
